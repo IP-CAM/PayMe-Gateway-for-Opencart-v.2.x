@@ -23,10 +23,7 @@ class ModelPaymentPayme extends Model {
 				$key=$this->config->get('payme_merchant_private_key');
 			}
 
-			$qry = $this->db->query("SELECT 
-									t.paycom_transaction_id,  
-									FROM " . DB_PREFIX . "payme_transactions t 
-									WHERE t.cms_order_id = '".$order_id. "'" );
+			$qry = $this->db->query("SELECT t.paycom_transaction_id FROM " . DB_PREFIX . "payme_transactions t WHERE t.cms_order_id = '".$order_id. "'" );
 
 			if ($qry->num_rows ==1){
 
@@ -58,21 +55,18 @@ class ModelPaymentPayme extends Model {
 		}
 	}
 
-	public function CheckRequest($inputArray) { 
+	public function CheckRequest($inputArray) {
 
-		//Check Method Post 32300
 		if ($_SERVER['REQUEST_METHOD']!='POST') {
 
 			$this->GenerateErrorResponse($inputArray['id'],'-32300',__METHOD__,false);
 
 		} else {
 
-			// Check Auth 32504
 				 if(! isset($_SERVER['PHP_AUTH_USER'])) $this->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__,false);
 			else if(! isset($_SERVER['PHP_AUTH_PW']))   $this->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__,false);
 			else {
 
-				// Check in Db by merchant_id 32504
 				if ($this->result){	
 
 					$merchantKey="";
@@ -86,7 +80,6 @@ class ModelPaymentPayme extends Model {
 
 					} else {
 
-						// Check Method Name 32601
 						if(! method_exists($this, $inputArray['method'])) {
 
 							$this->GenerateErrorResponse($inputArray['id'],'-32601',__METHOD__,false);
@@ -104,32 +97,27 @@ class ModelPaymentPayme extends Model {
 									t.amount,
 									t.order_id
 								FROM " . DB_PREFIX . "payme_transactions t 
-								WHERE t.cms_order_id = '".$this->db->escape($inputArray['params']['account']['order_id']). "'" );
+								WHERE t.cms_order_id = '".$this->db->escape($inputArray['params']['account']['order_id']). "'");
 
-		// Check is single and exists
 		if ($qry->num_rows !=1)
 		$this->GenerateErrorResponse($inputArray['id'], '-31050', __METHOD__, false );
 
 		if ($this->result){
 
-			// Check status of transaction
 			if($qry->row['state'] != 0) {
 
 				$this->GenerateErrorResponse($inputArray['id'], '-31050', __METHOD__, false );
-			}
-			// Check amount of transaction
-			else if($qry->row['amount'] != $inputArray['params']['amount']) {
+
+			} else if($qry->row['amount'] != $inputArray['params']['amount']) {
 
 				$this->GenerateErrorResponse($inputArray['id'], '-31001', __METHOD__, false );  
 
 			} else {
 
-				// All things is OK
 				$responseArray = array(); 
-				$responseArray['result'] = array ( 'allow' =>true );
+				$responseArray['result'] = array ( 'allow' => true );
 				$this->resultArray=json_encode($responseArray);	
 
-				// Status Pending 1
 				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistory($qry->row['order_id'], $this->config->get('payme_order_status_id'));
 			}
@@ -143,38 +131,31 @@ class ModelPaymentPayme extends Model {
 									t.paycom_time,
 									t.order_id
 								FROM " . DB_PREFIX . "payme_transactions t 
-								WHERE t.paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'" );
+								WHERE t.paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'");
 
-		// Check is single and exists
 		if ($qry->num_rows >1) {
 
 			$this->GenerateErrorResponse($inputArray['id'], '-31008', __METHOD__.">1", false );
 
 		} else if ($qry->num_rows ==1)	{
 
-			// Check status of transaction
 			if($qry->row['state'] != 1) {
 
 				$this->GenerateErrorResponse($inputArray['id'], '-31008', __METHOD__." !=1 ", false );
-			} 
-			// Check timeout
-			else if($qry->row['paycom_time']+43200000 <= $this->timestamp2milliseconds(time())) {
+
+			} else if($qry->row['paycom_time']+43200000 <= $this->timestamp2milliseconds(time())) {
 
 				$this->GenerateErrorResponse($inputArray['id'], '-31008', __METHOD__." timeout", false );
 
-				//Cencel transaction
 				$this->db->query("UPDATE " . DB_PREFIX . "payme_transactions SET state = -1, reason = 4, cancel_time =NOW() WHERE paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'" );
 
-				// Status Canceled 7
 				$this->load->model('checkout/order');		
 				$this->model_checkout_order->addOrderHistory( $qry->row['order_id'] , "7" );
 
 			} else {
 
-				// All things is OK
 				$this->GeneratePositiveResponse($inputArray['id'],$inputArray['params']['account']['order_id'],$inputArray['params']['id'], 1);
 
-				//Блокировка заказ status Processing 2
 				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistory( $qry->row['order_id'], "2");
 			}
@@ -185,16 +166,14 @@ class ModelPaymentPayme extends Model {
 			if ($this->result){ 
 
 				$this->db->query("UPDATE " . DB_PREFIX . "payme_transactions t SET 
-				t.state = 1,
-				t.paycom_time='".$this->db->escape($inputArray['params']['time'])."', 
-				t.paycom_time_datetime='".$this->timestamp2datetime($this->db->escape($inputArray['params']['time']))."',
-				t.paycom_transaction_id='".$this->db->escape($inputArray['params']['id'])."' 
-				WHERE t.cms_order_id = '".$this->db->escape($inputArray['params']['account']['order_id']). "'" );
+									t.state = 1,
+									t.paycom_time='".$this->db->escape($inputArray['params']['time'])."', 
+									t.paycom_time_datetime='".$this->timestamp2datetime($this->db->escape($inputArray['params']['time']))."',
+									t.paycom_transaction_id='".$this->db->escape($inputArray['params']['id'])."' 
+								 WHERE t.cms_order_id = '".$this->db->escape($inputArray['params']['account']['order_id']). "'" );
 
-				// All things is OK
 				$this->GeneratePositiveResponse($inputArray['id'],$inputArray['params']['account']['order_id'],$inputArray['params']['id'],1);
 
-				//Блокировка заказ status Processing 2
 				$this->load->model('checkout/order');		
 				$this->model_checkout_order->addOrderHistory( $inputArray['params']['account']['order_id'] , "2");
 			}
@@ -219,7 +198,6 @@ class ModelPaymentPayme extends Model {
 
 		} else if ($qry->num_rows==1) {
 
-			// Check status of transaction
 			if($qry->row['state'] != 1) {
 
 				if($qry->row['state'] != 2) {
@@ -228,33 +206,26 @@ class ModelPaymentPayme extends Model {
 
 				} else {
 
-					// All things is OK 
 					$this->GeneratePositiveResponse($inputArray['id'], $qry->row['order_id'], $inputArray['params']['id'], 2); 
 				}
 
 			} else {
 
-				// Check timeout
 				if($qry->row['paycom_time']+43200000 <= $this->timestamp2milliseconds(time())) {
 
 					$this->GenerateErrorResponse($inputArray['id'], '-31008', __METHOD__, false );
 
-					//Cencel transaction
 					$this->db->query("UPDATE " . DB_PREFIX . "payme_transactions SET state = -1, reason = 4, cancel_time =NOW() WHERE paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'" );
 
-					// Status Canceled 7
 					$this->load->model('checkout/order');
 					$this->model_checkout_order->addOrderHistory( $qry->row['order_id'], "7" );
 
 				} else {
 
-					// Update state
 					$this->db->query("UPDATE " . DB_PREFIX . "payme_transactions SET state = 2, perform_time =NOW() WHERE paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'" );
 
-					// All things is OK
 					$this->GeneratePositiveResponse($inputArray['id'],$qry->row['order_id'],$inputArray['params']['id'], 2); 
 
-					// Status Complete 5
 					$this->load->model('checkout/order');
 					$this->model_checkout_order->addOrderHistory( $qry->row['order_id'], "5");
 				}
@@ -280,16 +251,12 @@ class ModelPaymentPayme extends Model {
 
 		} else if ($qry->num_rows==1) {
 
-			// Check status of transaction
-			if($qry->row['state'] == 1) {
+			if ($qry->row['state'] == 1) {
 
-				//Cencel transaction
 				$this->db->query("UPDATE " . DB_PREFIX . "payme_transactions SET state = -1, cancel_time =NOW(),reason = ".$this->db->escape($inputArray['params']['reason']). " WHERE paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'" );
 
-				// All thing is OK 
 				$this->GeneratePositiveResponse($inputArray['id'],$qry->row['order_id'],$inputArray['params']['id'], 3); 
 
-				// Status Canceled 7
 				$this->load->model('checkout/order');		
 				$this->model_checkout_order->addOrderHistory( $qry->row['order_id'], "7" );
 
@@ -297,18 +264,14 @@ class ModelPaymentPayme extends Model {
 
 				if($qry->row['state'] != 2) {
 
-					// All thing is OK
 					$this->GeneratePositiveResponse($inputArray['id'],$qry->row['order_id'],$inputArray['params']['id'], 3); 
 
 				} else {
 
-					//Cencel transaction
 					$this->db->query("UPDATE " . DB_PREFIX . "payme_transactions SET state = -2, cancel_time =NOW(),reason = ".$this->db->escape($inputArray['params']['reason']). " WHERE paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'" );
 
-					// All thing is OK
 					$this->GeneratePositiveResponse($inputArray['id'],$qry->row['order_id'],$inputArray['params']['id'], 3);
 
-					// Status Canceled 7
 					$this->load->model('checkout/order');
 					$this->model_checkout_order->addOrderHistory( $qry->row['order_id'], "7" );
 				}
@@ -417,7 +380,6 @@ class ModelPaymentPayme extends Model {
 				$this->db->query("UPDATE " . DB_PREFIX . "setting SET `value`='".$inputArray['params']['password']."' WHERE `key` = 'payme_merchant_private_key' AND `group` = 'payme'");
 			}
 
-			// All things is OK
 			$responseArray = array(); 
 			$responseArray['result'] = array ( 'success' =>true );
 
@@ -433,7 +395,7 @@ class ModelPaymentPayme extends Model {
 								 t.perform_time,
 								 t.cancel_time
 						    FROM " . DB_PREFIX . "payme_transactions t
-						   WHERE t.cms_order_id = '".$this->db->escape($order_id). "'" );
+							WHERE t.cms_order_id = '".$this->db->escape($order_id). "'" );
 
 		if ($qry->num_rows ==1 ) {
 
@@ -555,7 +517,7 @@ class ModelPaymentPayme extends Model {
 		                                  "ru"=>'Транзакция не найдена.',
 						                  "uz"=>'Транзакция не найдена.',
 							              "en"=>'Транзакция не найдена.'
-										),	
+										),
 							'-31008' => array(
 		                                  "ru"=>'Невозможно выполнить операцию.',
 						                  "uz"=>'Невозможно выполнить операцию.',
@@ -566,7 +528,6 @@ class ModelPaymentPayme extends Model {
 						                  "uz"=>'Ошибки связанные с неверным пользовательским вводом account. Например: введённый логин не найден, введённый номер телефона не найден и т.д. Локализованное поле message обязательно. Поле data должно содержать название субполя account.',
 							              "en"=>'Ошибки связанные с неверным пользовательским вводом account. Например: введённый логин не найден, введённый номер телефона не найден и т.д. Локализованное поле message обязательно. Поле data должно содержать название субполя account.'
 										),
-							
 							'-32300' => array(
 		                                  "ru"=>'Ошибка возникает если метод запроса не POST.',
 						                  "uz"=>'Ошибка возникает если метод запроса не POST.',
@@ -603,21 +564,23 @@ class ModelPaymentPayme extends Model {
 							              "en"=>'Системная (внутренняя ошибка). Ошибку следует использовать в случае системных сбоев: отказа базы данных, отказа файловой системы, неопределенного поведения и т.д.'
 										)
 						    );
-						
+
 		return $listOfError[$codeOfError][$codOfLang];
 	}
-	
+
 	public function getMethod($address, $total) {
 
 		$this->load->language('payment/payme');
 
 		$status = true;
 		/*
-		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone WHERE geo_zone_id = '" . (int)$this->config->get('sanjar_geo_zone_id') . "' AND country_id = '" . (int)$address['country_id'] . "' AND (zone_id = '" . (int)$address['zone_id'] . "' OR zone_id = '0')");
+		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone 
+								  WHERE geo_zone_id = '" . (int)$this->config->get('payme_geo_zone_id') . "' AND 
+								        country_id  = '" . (int)$address['country_id'] . "' AND (zone_id = '" . (int)$address['zone_id'] . "' OR zone_id = '0')");
 
-		if ($this->config->get('sanjar_total') > 0 && $this->config->get('sanjar_total') > $total) {
+		if ($this->config->get('payme_total') > 0 && $this->config->get('payme_total') > $total) {
 			$status = false;
-		} elseif (!$this->config->get('sanjar_geo_zone_id')) {
+		} elseif (!$this->config->get('payme_geo_zone_id')) {
 			$status = true;
 		} elseif ($query->num_rows) {
 			$status = true;
@@ -633,7 +596,7 @@ class ModelPaymentPayme extends Model {
 				'code'       => 'payme',
 				'title'      => $this->language->get('text_title'),
 				'terms'      => '',
-				'sort_order' => $this->config->get('sanjar_sort_order')
+				'sort_order' => $this->config->get('payme_sort_order')
 			);
 		}
 
