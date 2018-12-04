@@ -28,21 +28,18 @@ $_['entry_enable_test_mode']          = 'Включить режим тести�
 $_['entry_redirection_url']		 	  = 'Перенаправление URL';
 $_['entry_merchant_id']    			  = 'ID поставщика';
 $_['entry_merchant_private_key']      = 'Ключ - пароль кассы';
-$_['entry_merchant_private_key_test'] = 'Ключ - пароль для тестов';
-$_['entry_checkout_url']       		  = 'Введите URL-адрес шлюза';
-$_['entry_checkout_url_test']         = 'Введите URL-адрес шлюза для теста';
+$_['entry_merchant_private_key_test'] = 'Ключ - пароль для теста';
+$_['entry_checkout_url']       		  = 'URL-адрес шлюза';
+$_['entry_checkout_url_test']         = 'URL-адрес шлюза для теста';
 $_['entry_payme_url']             	  = 'Url для Payme';
 $_['entry_return_after_payment']      = 'Вернуться после оплаты через';
 $_['entry_add_product_information_']  = 'Добавить в чек данные о товарах';
 
 //Error
 $_['error_merchant_id']               = 'Идентификатор приложения требуется!';
-$_['error_permission']				  = 'Warning: You do not have permission to modify payment Payme!';
-$_['error_merchant_private_key']      = 'Приватный ключ платежной системы Payme требуется!';
-$_['error_merchant_private_key_test'] = 'Публичный ключ платежной системы Payme требуется!';
-$_['error_checkout_url']              = 'Установите Paycom Checkout URL для подтверждения оплаты';
-$_['error_checkout_url_test']         = 'Установите Paycom Checkout URL для подтверждения оплаты';
-$_['error_payme_url']                 = 'Url для Payme';
- 
-
-
+$_['error_permission']				  = 'Предупреждение: у вас нет разрешения на изменение платежа Payme!';
+$_['error_merchant_private_key']      = 'Ключ - пароль кассы системы Payme требуется!';
+$_['error_merchant_private_key_test'] = 'Ключ - пароль для тестов системы Payme требуется!';
+$_['error_checkout_url']              = 'URL-адрес шлюза требуется!';
+$_['error_checkout_url_test']         = 'URL-адрес шлюза для теста требуется!';
+$_['error_payme_url']                 = 'Url для Payme требуется!';

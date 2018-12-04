@@ -6,7 +6,7 @@ $_['heading_title']					  = 'Payme';
 //Text
 $_['text_payme']					  = '<a href="https://business.payme.uz/" target="_blank"><img src="view/image/payment/payme.png" alt="payme" title="payme" style="border: 1px solid #EEEEEE;" /></a>';
 $_['text_set_payment_options']        = 'Set payment options';
-$_['text_link_to_personal_cabinet']   = 'Настройки для кассы можно взять из кабинета <a href="https://paycom.uz/">поставщика</a> Раздел Параметры для разработчика';
+$_['text_link_to_personal_cabinet']   = 'Setting can be taken from personal cabinet <a href="https://paycom.uz/">of Merchant</a> Developer options section';
 $_['text_yes']              		  = 'Yes';
 $_['text_no']              			  = 'No';
 $_['text_enable']              		  = 'Enable';
@@ -19,30 +19,27 @@ $_['text_success']                    = 'Success: You have modified Payme accoun
 
 
 //Hint
-$_['hint_endpoint_url']  			  = 'Данные URL необходимо внести в настроеки кассы в кабинете поставщика';
+$_['hint_endpoint_url']  			  = 'This URL must be entered setting of cashier in personal cabinet of Merchant';
 
 // Entry
-$_['entry_payme_status']			  = 'Статус';
+$_['entry_payme_status']			  = 'Status';
 $_['entry_endpoint_url']			  = 'Endpoint Url';
-$_['entry_enable_test_mode']          = 'Включить режим тестирования';
-$_['entry_redirection_url']		 	  = 'Перенаправление URL';
-$_['entry_merchant_id']    			  = 'ID поставщика';
-$_['entry_merchant_private_key']      = 'Ключ - пароль кассы';
-$_['entry_merchant_private_key_test'] = 'Ключ - пароль для тестов';
-$_['entry_checkout_url']       		  = 'Введите URL-адрес шлюза';
-$_['entry_checkout_url_test']         = 'Введите URL-адрес шлюза для теста';
-$_['entry_payme_url']             	  = 'Url для Payme';
-$_['entry_return_after_payment']      = 'Вернуться после оплаты через';
-$_['entry_add_product_information_']  = 'Добавить в чек данные о товарах';
+$_['entry_enable_test_mode']          = 'Enable test mode';
+$_['entry_redirection_url']		 	  = 'Redirection URL';
+$_['entry_merchant_id']    			  = 'Merchant Id';
+$_['entry_merchant_private_key']      = 'Key - checkout password';
+$_['entry_merchant_private_key_test'] = 'Key - checkout password for test';
+$_['entry_checkout_url']       		  = 'URL gateway';
+$_['entry_checkout_url_test']         = 'URL gateway for test';
+$_['entry_payme_url']             	  = 'Url for Payme';
+$_['entry_return_after_payment']      = 'Return after payment';
+$_['entry_add_product_information_']  = 'Add information about products to check';
 
 //Error
-$_['error_merchant_id']               = 'Идентификатор приложения требуется!';
+$_['error_merchant_id']               = 'Merchant Id is required!';
 $_['error_permission']				  = 'Warning: You do not have permission to modify payment Payme!';
-$_['error_merchant_private_key']      = 'Приватный ключ платежной системы Payme требуется!';
-$_['error_merchant_private_key_test'] = 'Публичный ключ платежной системы Payme требуется!';
-$_['error_checkout_url']              = 'Установите Paycom Checkout URL для подтверждения оплаты';
-$_['error_checkout_url_test']         = 'Установите Paycom Checkout URL для подтверждения оплаты';
-$_['error_payme_url']                 = 'Url для Payme';
- 
-
-
+$_['error_merchant_private_key']      = 'Key - checkout password is required!';
+$_['error_merchant_private_key_test'] = 'Key - checkout password for test is require!';
+$_['error_checkout_url']              = 'URL gateway is required!';
+$_['error_checkout_url_test']         = 'URL gateway for test  is required!';
+$_['error_payme_url']                 = 'Url for Payme  is required!';

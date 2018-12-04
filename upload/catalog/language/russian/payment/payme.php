@@ -1,14 +1,13 @@
 <?php
 // Heading
-$_['heading_title']				= 'Thank you for shopping with %s .... ';
+$_['heading_title']				= 'Благодарим вас за покупки с %s .... ';
 
 // Text
 $_['text_title']				= 'Payme';
-$_['text_response']				= 'Response from sanjar:';
-$_['text_success']				= '... your payment was successfully received.';
-$_['text_success_wait']			= '<b><span style="color: #FF0000">Please wait...</span></b> whilst we finish processing your order.<br>If you are not automatically re-directed in 10 seconds, please click <a href="%s">here</a>.';
-$_['text_failure']				= '... Your payment has been cancelled!';
-$_['text_failure_wait']			= '<b><span style="color: #FF0000">Please wait...</span></b><br>If you are not automatically re-directed in 10 seconds, please click <a href="%s">here</a>.';
+$_['text_response']				= 'Ответ от Payme:';
+$_['text_success']				= '... ваш платеж был успешно принят.';
+$_['text_success_wait']			= '<b><span style="color: #FF0000">пожалуйста, подождите...</span></b> пока мы закончим обработку вашего заказа.<br>Если вы не будете автоматически перенаправлены через 10 секунд, нажмите <a href="%s">сюда</a>.';
+$_['text_failure']				= '... Ваш платеж отменен!';
+$_['text_failure_wait']			= '<b><span style="color: #FF0000">пожалуйста, подождите...</span></b><br>Если вы не будете автоматически перенаправлены через 10 секунд, нажмите <a href="%s">сюда</a>.';
 
-
-$_['button_confirm']			= 'Thank you for shopping';
+$_['button_confirm']			= 'Спасибо за покупки!';
