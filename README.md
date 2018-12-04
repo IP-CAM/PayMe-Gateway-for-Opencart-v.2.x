@@ -1,4 +1,4 @@
-# OpenCart Payment Gateway for OpenCart version 2.0.0.0
+# Payment Gateway for OpenCart version 2.0.0.0
 
 ## Requirements
 
