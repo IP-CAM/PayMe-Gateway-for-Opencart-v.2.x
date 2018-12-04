@@ -2,7 +2,7 @@
 
 ## Requirements
 
-- OpenCart 3.x
+- OpenCart 2.
 - Merchant ID, Production & Test Keys
 - Production & Test Gateway URLs
 
