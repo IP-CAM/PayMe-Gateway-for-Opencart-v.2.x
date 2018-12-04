@@ -1,8 +1,8 @@
-# OpenCart Payment Gateway
+# OpenCart Payment Gateway for OpenCart version 2.0.0.0
 
 ## Requirements
 
-- OpenCart 2.
+- OpenCart 2.0.0.0.
 - Merchant ID, Production & Test Keys
 - Production & Test Gateway URLs
 
