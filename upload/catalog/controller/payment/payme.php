@@ -21,6 +21,7 @@ class ControllerPaymentPayme extends Controller {
 			default: $parsingJson=true; break;
 		}
 
+		$this->response->addHeader('Content-Type: application/json');
 		$this->load->model('payment/payme');
 
 		if ($parsingJsonError) {
@@ -50,12 +51,11 @@ class ControllerPaymentPayme extends Controller {
 
 		$data['merchant_id'] = $this->config->get('payme_merchant_id');
 		$data['pay_time']    = $this->config->get('payme_callback_pay_time');
-		$data['information'] = $this->config->get('payme_product_information');
 		$data['redirect']    = $this->config->get('payme_order_return');
-
 		$data['order_id']    = trim($this->session->data['order_id']);
 		$data['total']       = $this->currency->format($order_info['total'], $order_info['currency_code'], $order_info['currency_value'], false)*100;
-
+		$data['detail'] 	 = "";
+		
 			 if( $order_info['currency_code'] == 'UZS') $data['currency'] = 860;
 		else if( $order_info['currency_code'] == 'USD') $data['currency'] = 840;
 		else if( $order_info['currency_code'] == 'RUB') $data['currency'] = 643;
@@ -73,6 +73,29 @@ class ControllerPaymentPayme extends Controller {
 
 		$this->load->model('payment/payme');
 		$this->model_payment_payme->SaveOrder($data['total'], $data['order_id'], $data['order_id'], $this->config->get('payme_test_enabled'));
+
+		if ( $this->config->get('payme_product_information') == 'Y' ) {
+
+			$products=array( );
+
+			$qry = $this->db->query("SELECT * FROM `" . DB_PREFIX . "order_product` o WHERE o.order_id = " . (int)$data['order_id'] );
+
+			foreach ($qry->rows as $row) {
+
+				array_push($products,array(
+
+					"name"      => addslashes($row["name"]),
+					"model"     => addslashes($row["model"]),
+					"quantity"	=> $row["quantity"],
+					"price"		=> $row['price'] ,
+					"total"     => $row["total"],
+					"tax"       => $row["tax"] 
+				));
+			}
+
+			$productArray = array( "products"=> $products );
+			$data['detail'] = base64_encode( json_encode($productArray) );
+	 	}
 
 		return $this->load->view('default/template/payment/payme.tpl', $data);
 	}

@@ -6,6 +6,7 @@
 <input type="hidden" name="callback"			value="<?php echo $redirect; ?>"/>
 <input type="hidden" name="account[order_id]"	value="<?php echo $order_id; ?>"/>
 <input type="hidden" name="currency"			value="<?php echo $currency; ?>"/>
+<input type="hidden" name="detail"			    value="<?php echo $detail; ?>"/>
 
 <div class="buttons">
 	<div class="pull-right">

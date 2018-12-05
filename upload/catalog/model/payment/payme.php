@@ -37,7 +37,8 @@ class ModelPaymentPayme extends Model {
 					$jsonData['params'] =array('id'=>$qry->row['paycom_transaction_id']);
 					$jsonDataEncoded = json_encode($jsonData);
 
-					//error_log($url."   jsonDataEncoded =".$jsonDataEncoded);
+					//$log = new Log('payme.log');					
+					//$log->write( " jsonDataEncoded =".$jsonDataEncoded );
 
 					curl_setopt($ch, CURLOPT_POST, 1);
 					curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDataEncoded);
@@ -47,7 +48,7 @@ class ModelPaymentPayme extends Model {
 					$result = curl_exec($ch);
 
 					//var_dump(json_decode($result, true));
-					//error_log(" 1  ReceiptsCancel end ".$result);
+					//$log->write( " 1  ReceiptsCancel end ".$result );
 
 					curl_close($ch);
 				}
@@ -63,11 +64,11 @@ class ModelPaymentPayme extends Model {
 
 		} else {
 
-				 if(! isset($_SERVER['PHP_AUTH_USER'])) $this->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__,false);
-			else if(! isset($_SERVER['PHP_AUTH_PW']))   $this->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__,false);
+				 if(! isset($_SERVER['PHP_AUTH_USER'])) $this->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__.'Point 1',false);
+			else if(! isset($_SERVER['PHP_AUTH_PW']))   $this->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__.'Point 2',false);
 			else {
 
-				if ($this->result){	
+				if ($this->result){
 
 					$merchantKey="";
 
@@ -76,7 +77,7 @@ class ModelPaymentPayme extends Model {
 
 					if( $merchantKey != html_entity_decode($_SERVER['PHP_AUTH_PW']) ) {
 
-						$this->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__,false);
+						$this->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__.'Point 3',false);
 
 					} else {
 
@@ -139,17 +140,20 @@ class ModelPaymentPayme extends Model {
 
 		} else if ($qry->num_rows ==1)	{
 
+			$paycom_time_integer=(int)$qry->row['paycom_time'];
+			$paycom_time_integer=$paycom_time_integer+43200000;
+
 			if($qry->row['state'] != 1) {
 
 				$this->GenerateErrorResponse($inputArray['id'], '-31008', __METHOD__." !=1 ", false );
 
-			} else if($qry->row['paycom_time']+43200000 <= $this->timestamp2milliseconds(time())) {
+			} else if( $paycom_time_integer <= $this->timestamp2milliseconds(time())) {
 
 				$this->GenerateErrorResponse($inputArray['id'], '-31008', __METHOD__." timeout", false );
 
 				$this->db->query("UPDATE " . DB_PREFIX . "payme_transactions SET state = -1, reason = 4, cancel_time =NOW() WHERE paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'" );
 
-				$this->load->model('checkout/order');		
+				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistory( $qry->row['order_id'] , "7" );
 
 			} else {
@@ -159,6 +163,7 @@ class ModelPaymentPayme extends Model {
 				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistory( $qry->row['order_id'], "2");
 			}
+
 		} else if ($qry->num_rows ==0){
 
 			$this->CheckPerformTransaction($inputArray,1);
@@ -174,7 +179,7 @@ class ModelPaymentPayme extends Model {
 
 				$this->GeneratePositiveResponse($inputArray['id'],$inputArray['params']['account']['order_id'],$inputArray['params']['id'],1);
 
-				$this->load->model('checkout/order');		
+				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistory( $inputArray['params']['account']['order_id'] , "2");
 			}
 		}
@@ -188,6 +193,7 @@ class ModelPaymentPayme extends Model {
 									t.order_id
 								FROM " . DB_PREFIX . "payme_transactions t 
 								WHERE t.paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'" );
+
 		if ($qry->num_rows ==0) {
 
 			$this->GenerateErrorResponse($inputArray['id'], '-31003', __METHOD__, false );
@@ -211,7 +217,10 @@ class ModelPaymentPayme extends Model {
 
 			} else {
 
-				if($qry->row['paycom_time']+43200000 <= $this->timestamp2milliseconds(time())) {
+				$paycom_time_integer=(int)$qry->row['paycom_time'];
+				$paycom_time_integer=$paycom_time_integer+43200000;
+
+				if( $paycom_time_integer <= $this->timestamp2milliseconds(time()) ) {
 
 					$this->GenerateErrorResponse($inputArray['id'], '-31008', __METHOD__, false );
 
@@ -257,7 +266,7 @@ class ModelPaymentPayme extends Model {
 
 				$this->GeneratePositiveResponse($inputArray['id'],$qry->row['order_id'],$inputArray['params']['id'], 3); 
 
-				$this->load->model('checkout/order');		
+				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistory( $qry->row['order_id'], "7" );
 
 			} else {
@@ -289,6 +298,7 @@ class ModelPaymentPayme extends Model {
 									 t.reason
 								FROM " . DB_PREFIX . "payme_transactions t 
 								WHERE t.paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'" );
+
 		if ($qry->num_rows ==0) {
 
 			$this->GenerateErrorResponse($inputArray['id'], '-31003', __METHOD__, false );
@@ -342,14 +352,16 @@ class ModelPaymentPayme extends Model {
 			array_push($transactions,array(
 
 				"id"           => $row["paycom_transaction_id"],
+				"time"		   => $row['paycom_time']  ,
 				"amount"       => $row["amount"],
-				"state"	       => (int) row['state'],
-				"reason"       => (is_null($qry->row['reason'])?null:(int) row['reason']) ,
-
+				"account"	   => array("order_id" => $row["order_id"]),
 				"create_time"  => (is_null($row['create_time']) ? null: $this->datetime2timestamp( $row['create_time']) ) ,
 				"perform_time" => (is_null($row['perform_time'])? null: $this->datetime2timestamp( $row['perform_time'])) ,
 				"cancel_time"  => (is_null($row['cancel_time']) ? null: $this->datetime2timestamp( $row['cancel_time']) ) ,
-
+				"transaction"  => $row["order_id"],
+				"state"	       => (int) $row['state'],
+				"reason"       => (is_null($row['reason'])?null:(int) $row['reason']) ,
+				
 				"receivers"    => null
 			)) ;
 		}
@@ -407,7 +419,7 @@ class ModelPaymentPayme extends Model {
 				$responseArray['result'] = array(
 
 						"create_time"	=> $this->datetime2timestamp($qry->row['create_time'])*1000,
-						"transaction"	=> $transaction_id,
+						"transaction"	=> $order_id,
 						"state"			=> (int)$qry->row['state']
 				);
 
@@ -416,7 +428,7 @@ class ModelPaymentPayme extends Model {
 				$responseArray['result'] = array(
 
 						"perform_time"	=> $this->datetime2timestamp($qry->row['perform_time'])*1000,
-						"transaction"	=> $transaction_id,
+						"transaction"	=> $order_id,
 						"state"			=> (int)$qry->row['state']
 				);
 			} else if ($responseType==3) {
@@ -424,7 +436,7 @@ class ModelPaymentPayme extends Model {
 				$responseArray['result'] = array(
 
 						"cancel_time"	=> $this->datetime2timestamp($qry->row['cancel_time'])*1000,
-						"transaction"	=> $transaction_id,
+						"transaction"	=> $order_id,
 						"state"			=> (int)$qry->row['state']
 				);
 			}
@@ -573,25 +585,17 @@ class ModelPaymentPayme extends Model {
 		$this->load->language('payment/payme');
 
 		$status = true;
-		/*
-		$query = $this->db->query("SELECT * FROM " . DB_PREFIX . "zone_to_geo_zone 
-								  WHERE geo_zone_id = '" . (int)$this->config->get('payme_geo_zone_id') . "' AND 
-								        country_id  = '" . (int)$address['country_id'] . "' AND (zone_id = '" . (int)$address['zone_id'] . "' OR zone_id = '0')");
-
-		if ($this->config->get('payme_total') > 0 && $this->config->get('payme_total') > $total) {
-			$status = false;
-		} elseif (!$this->config->get('payme_geo_zone_id')) {
-			$status = true;
-		} elseif ($query->num_rows) {
+		
+		if ($total > 0) {
 			$status = true;
 		} else {
 			$status = false;
 		}
-        */
 
 		$method_data = array();
 
 		if ($status) {
+
 			$method_data = array(
 				'code'       => 'payme',
 				'title'      => $this->language->get('text_title'),
