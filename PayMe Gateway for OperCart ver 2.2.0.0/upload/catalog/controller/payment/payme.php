@@ -1,6 +1,12 @@
 <?php
-class ControllerExtensionPaymentPayme extends Controller {
+class ControllerPaymentPayme extends Controller {
 
+	public function on_order_delete($route, $order_id){
+
+		$this->load->model('payment/payme');
+		$this->model_payment_payme->ReceiptsCancel($order_id);
+	}
+ 
 	public function callback() {
 
 		$inputStream = file_get_contents("php://input");
@@ -16,23 +22,23 @@ class ControllerExtensionPaymentPayme extends Controller {
 		}
 
 		$this->response->addHeader('Content-Type: application/json');
-		$this->load->model('extension/payment/payme');
+		$this->load->model('payment/payme');
 
 		if ($parsingJsonError) {
 
-			exit($this->model_extension_payment_payme->GenerateErrorResponse(0,'-32700',__METHOD__));
+			exit($this->model_payment_payme->GenerateErrorResponse(0,'-32700',__METHOD__));
 
 		} else if ($_SERVER['REQUEST_METHOD']!='POST') {
 
-			exit($this->model_extension_payment_payme->GenerateErrorResponse($inputArray['id'],'-32300',__METHOD__));
+			exit($this->model_payment_payme->GenerateErrorResponse($inputArray['id'],'-32300',__METHOD__));
 
 		} else if(! isset($_SERVER['PHP_AUTH_USER'])) {
 
-			exit($this->model_extension_payment_payme->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__.'Point 1'));
+			exit($this->model_payment_payme->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__.'Point 1'));
 
 		} else if(! isset($_SERVER['PHP_AUTH_PW'])) {
 
-			exit($this->model_extension_payment_payme->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__.'Point 2'));
+			exit($this->model_payment_payme->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__.'Point 2'));
 
 		} else {
 
@@ -43,17 +49,17 @@ class ControllerExtensionPaymentPayme extends Controller {
 
 			if( $merchantKey != html_entity_decode($_SERVER['PHP_AUTH_PW']) ) {
 
-				exit($this->model_extension_payment_payme->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__.'Point 3'));
+				exit($this->model_payment_payme->GenerateErrorResponse($inputArray['id'],'-32504',__METHOD__.'Point 3'));
 
 			} else {
 
-				if( $this->model_extension_payment_payme->isMethodExists($inputArray)) {
+				if( $this->model_payment_payme->isMethodExists($inputArray)) {
 
-					exit($this->model_extension_payment_payme->$inputArray['method']($inputArray));
+					exit($this->model_payment_payme->$inputArray['method']($inputArray));
 
 				} else {
 
-					exit($this->model_extension_payment_payme->GenerateErrorResponse($inputArray['id'],'-32601',__METHOD__));
+					exit($this->model_payment_payme->GenerateErrorResponse($inputArray['id'],'-32601',__METHOD__));
 				}
 			}
 		}
@@ -89,8 +95,8 @@ class ControllerExtensionPaymentPayme extends Controller {
 			$data['checkout_url'] = $this->config->get('payme_checkout_url');
 		}
 
-		$this->load->model('extension/payment/payme');
-		$this->model_extension_payment_payme->SaveOrder($data['total'], $data['order_id'], $data['order_id'], $this->config->get('payme_test_enabled'));
+		$this->load->model('payment/payme');
+		$this->model_payment_payme->SaveOrder($data['total'], $data['order_id'], $data['order_id'], $this->config->get('payme_test_enabled'));
 
 		if ( $this->config->get('payme_product_information') == 'Y' ) {
 
@@ -115,6 +121,13 @@ class ControllerExtensionPaymentPayme extends Controller {
 			$data['detail'] = base64_encode( json_encode($productArray) );
 	 	}
 
-		return $this->load->view('extension/payment/payme', $data); 
+		if (VERSION == '2.2.0.0') {
+
+			return $this->load->view('payment/payme.tpl', $data);
+
+		} else {
+
+			return $this->load->view('default/template/payment/payme.tpl', $data);
+		}
 	}
 }

@@ -1,29 +1,23 @@
 <?php 
 
-class ControllerExtensionPaymentPayme extends Controller {
+class ControllerPaymentPayme extends Controller {
 
 	private $error = array();
 
-	public function on_order_delete ($route,$order_id){		
- 
-		$this->load->model('extension/payment/payme');
-		$this->model_extension_payment_payme->ReceiptsCancel($order_id[0]);	 
-	}
-	
 	public function install() {
 	  
-		$this->load->model('extension/payment/payme');
-		$this->model_extension_payment_payme->CreateTable();		
-
+		$this->load->model('payment/payme');
+		$this->model_payment_payme->CreateTable();
+		
 		// Fixed for this version
 		$this->load->model('extension/event');
-		$this->model_extension_event->addEvent('payme', 'admin/model/sale/order/deleteOrder/before', 'extension/payment/payme/on_order_delete');
+		$this->model_extension_event->addEvent('payme', 'catalog/model/checkout/order/deleteOrder/before', 'payment/payme/on_order_delete');
 	}
 
 	public function uninstall() {
 
-		$this->load->model('extension/payment/payme');
-		$this->model_extension_payment_payme->DropTable();
+		$this->load->model('payment/payme');
+		$this->model_payment_payme->DropTable();
 
 		// Fixed for this version
 		$this->load->model('extension/event');
@@ -41,7 +35,7 @@ class ControllerExtensionPaymentPayme extends Controller {
 		$data['payme_callback_pay_time'] = 0;
 		$data['payme_product_information'] = 'N';
 
-		$this->load->language('extension/payment/payme');
+		$this->load->language('payment/payme');
 
 		$this->document->setTitle($this->language->get('heading_title'));
 
@@ -52,8 +46,8 @@ class ControllerExtensionPaymentPayme extends Controller {
 			$this->model_setting_setting->editSetting('payme', $this->request->post);
 
 			$this->session->data['success'] = $this->language->get('text_success');
-			
-			$this->response->redirect($this->url->link('extension/extension', 'token=' . $this->session->data['token'] . '&type=payment', true));
+
+			$this->response->redirect($this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL'));
 		} 
 
 		// Check permission
@@ -188,14 +182,12 @@ class ControllerExtensionPaymentPayme extends Controller {
 		$data['entry_return_after_payment']      	= $this->language->get('entry_return_after_payment');
 		$data['entry_add_product_information_']  	= $this->language->get('entry_add_product_information_'); 
 
-		$data['payme_endpoint_url'] 				= str_replace('admin/', '', HTTPS_SERVER)."?route=extension/payment/callback";
+		$data['payme_endpoint_url'] 				= str_replace('admin/', '', HTTPS_SERVER)."?route=payment/callback";
 		$data['payme_order_return'] 				= str_replace('admin/', '', HTTPS_SERVER)."?route=account/order";
 		$data['payme_subscribe_api_url']      		= "https://checkout.paycom.uz/api";
 		$data['payme_subscribe_api_url_test'] 		= "https://checkout.test.paycom.uz/api";
-		
-		// Fixed for this version
-		$data['cancel']                             = $this->url->link('extension/extension',        'token=' . $this->session->data['token'] . '&type=payment', true);	
-		$data['action']                             = $this->url->link('extension/payment/payme',    'token=' . $this->session->data['token'], true); 
+		$data['cancel'] 							= $this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL');
+		$data['action'] 							= $this->url->link('payment/payme', 	'token=' . $this->session->data['token'], 'SSL');
 
 		$data['payme_callback_pay_time_list'] = array(
 			array('value'=>0,	    'name'=>      $this->language->get('text_instantly')),
@@ -203,22 +195,21 @@ class ControllerExtensionPaymentPayme extends Controller {
 			array('value'=>30000,	'name'=>'30 '.$this->language->get('text_seconds')),
 			array('value'=>60000,	'name'=>'60 '.$this->language->get('text_seconds'))
 		);
-		
 		$data['breadcrumbs']   = array();
-		$data['breadcrumbs'][] = array( 'text' => $this->language->get('text_home_page'),    'href' => $this->url->link('common/dashboard',        'token=' . $this->session->data['token'], true) );
-		$data['breadcrumbs'][] = array( 'text' => $this->language->get('text_payment_list'), 'href' => $this->url->link('extension/extension',     'token=' . $this->session->data['token']. '&type=payment', true) );
-        $data['breadcrumbs'][] = array( 'text' => $this->language->get('heading_title'),	 'href' => $this->url->link('extension/payment/payme', 'token=' . $this->session->data['token'], true) );
+		$data['breadcrumbs'][] = array( 'text' => $this->language->get('text_home_page'),    'href' => $this->url->link('common/dashboard',  'token=' . $this->session->data['token'], 'SSL') );
+		$data['breadcrumbs'][] = array( 'text' => $this->language->get('text_payment_list'), 'href' => $this->url->link('extension/payment', 'token=' . $this->session->data['token'], 'SSL') );
+        $data['breadcrumbs'][] = array( 'text' => $this->language->get('heading_title'),	 'href' => $this->url->link('payment/payme',     'token=' . $this->session->data['token'], 'SSL') );
 
 		$data['header']      = $this->load->controller('common/header');
 		$data['column_left'] = $this->load->controller('common/column_left');
 		$data['footer']      = $this->load->controller('common/footer');
 
-		$this->response->setOutput($this->load->view('extension/payment/payme', $data));
+		$this->response->setOutput($this->load->view('payment/payme.tpl', $data));
 	}
 
 	protected function validate() {
 
-		if (!$this->user->hasPermission('modify', 'extension/payment/payme')) {
+		if (!$this->user->hasPermission('modify', 'payment/payme')) {
 			$this->error['warning'] = $this->language->get('error_permission');
 		}
 

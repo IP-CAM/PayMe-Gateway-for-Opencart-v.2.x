@@ -92,8 +92,7 @@ class ModelPaymentPayme extends Model {
 	}
 
 	public function CheckPerformTransaction($inputArray, $actionFromCreateTransaction=false) {
-$log = new Log('payme 1.log');					
-$log->write( " CheckPerformTransaction 1 " );
+
 		$qry = $this->db->query("SELECT 
 									t.state, 
 									t.amount,
@@ -102,26 +101,26 @@ $log->write( " CheckPerformTransaction 1 " );
 								WHERE t.cms_order_id = '".$this->db->escape($inputArray['params']['account']['order_id']). "'");
 
 		if ($qry->num_rows !=1) {
-$log->write( " CheckPerformTransaction 2 " );			
+			
 			return $this->GenerateErrorResponse($inputArray['id'], '-31050', __METHOD__);
 
 		} else {
-$log->write( " CheckPerformTransaction 3 " );			
+		
 			if($qry->row['state'] != 0) {
-$log->write( " CheckPerformTransaction 4 " );
+
 				return $this->GenerateErrorResponse($inputArray['id'], '-31050', __METHOD__);
 
 			} else if($qry->row['amount'] != $inputArray['params']['amount']) {
-$log->write( " CheckPerformTransaction 5 " );
+
 				return $this->GenerateErrorResponse($inputArray['id'], '-31001', __METHOD__);  
 
 			} else {
-$log->write( " CheckPerformTransaction 6 " );
+
 				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistory($qry->row['order_id'], $this->config->get('payme_order_status_id'));
 				
 				if ($actionFromCreateTransaction) {
-$log->write( " CheckPerformTransaction 7 " );
+
 					//Action from CreateTransaction
 					
 					$this->db->query("UPDATE " . DB_PREFIX . "payme_transactions t SET 
@@ -136,7 +135,7 @@ $log->write( " CheckPerformTransaction 7 " );
 					return $this->GeneratePositiveResponse($inputArray['id'],$inputArray['params']['account']['order_id'],$inputArray['params']['id'],1);
 					
 				} else {
-$log->write( " CheckPerformTransaction 8 " );					
+					
 					$responseArray = array(); 
 					$responseArray['result'] = array ( 'allow' => true );
 
@@ -147,8 +146,7 @@ $log->write( " CheckPerformTransaction 8 " );
 	}
 
 	public function CreateTransaction($inputArray) {
-$log = new Log('payme.log');					
-$log->write( " CreateTransaction 1 " );
+
 		$qry = $this->db->query("SELECT 
 									t.state,
 									t.paycom_time,
@@ -157,20 +155,20 @@ $log->write( " CreateTransaction 1 " );
 								WHERE t.paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'");
 
 		if ($qry->num_rows >1) {
-$log->write( " CreateTransaction 2 " );
+
 			return $this->GenerateErrorResponse($inputArray['id'], '-31008', __METHOD__.">1");
 
 		} else if ($qry->num_rows ==1)	{
-$log->write( " CreateTransaction 3 " );
+
 			$paycom_time_integer=(int)$qry->row['paycom_time'];
 			$paycom_time_integer=$paycom_time_integer+43200000;
 
 			if($qry->row['state'] != 1) {
-$log->write( " CreateTransaction 4 " );
+
 				return $this->GenerateErrorResponse($inputArray['id'], '-31008', __METHOD__." !=1 ");
 
 			} else if( $paycom_time_integer <= $this->timestamp2milliseconds(time())) {
-$log->write( " CreateTransaction 5 " );
+
 				$this->db->query("UPDATE " . DB_PREFIX . "payme_transactions SET state = -1, reason = 4, cancel_time =NOW() WHERE paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'" );
 
 				$this->load->model('checkout/order');
@@ -179,7 +177,7 @@ $log->write( " CreateTransaction 5 " );
 				return $this->GenerateErrorResponse($inputArray['id'], '-31008', __METHOD__." timeout");
 
 			} else {
-$log->write( " CreateTransaction 6 " );
+
 				$this->load->model('checkout/order');
 				$this->model_checkout_order->addOrderHistory( $qry->row['order_id'], "2");
 				
@@ -187,7 +185,7 @@ $log->write( " CreateTransaction 6 " );
 			}
 
 		} else if ($qry->num_rows ==0){
-$log->write( " CreateTransaction 7 " );
+
 			return $this->CheckPerformTransaction($inputArray, true);
 		}
 	}

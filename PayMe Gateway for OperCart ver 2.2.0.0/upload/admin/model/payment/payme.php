@@ -1,57 +1,6 @@
 <?php
 
-class ModelExtensionPaymentPayme extends Model {
-		
-	public function ReceiptsCancel($order_id) {
-
-		$this->load->model('sale/order');
-		$order_info = $this->model_sale_order->getOrder($order_id);
-
-		if ($order_info['payment_method'] == 'Payme' ) {
-
-			if ($this->config->get('payme_test_enabled')=='Y'){
-
-				$url=$this->config->get('payme_subscribe_api_url_test');
-				$key=$this->config->get('payme_merchant_private_key_test');
-
-			} else if ($this->config->get('payme_test_enabled')=='N') {
-
-				$url=$this->config->get('payme_subscribe_api_url');
-				$key=$this->config->get('payme_merchant_private_key');
-			}
-
-			$qry = $this->db->query("SELECT t.paycom_transaction_id FROM " . DB_PREFIX . "payme_transactions t WHERE t.cms_order_id = '".$order_id. "'" );
-
-			if ($qry->num_rows ==1){
-
-				if ($qry->row['paycom_transaction_id']) {
-
-					$ch = curl_init($url);
-
-					$jsonData = array(); 
-					$jsonData['id'] =(int) $order_id;
-					$jsonData['method'] = "receipts.cancel";
-					$jsonData['params'] =array('id'=>$qry->row['paycom_transaction_id']);
-					$jsonDataEncoded = json_encode($jsonData);
-
-					//$log = new Log('payme.log');					
-					//$log->write( " jsonDataEncoded =".$jsonDataEncoded );
-
-					curl_setopt($ch, CURLOPT_POST, 1);
-					curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonDataEncoded);
-					curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json'));
-					curl_setopt($ch, CURLOPT_HTTPHEADER, array('X-Auth: '.$this->config->get('payme_merchant_id').":".$key));
-					curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-					$result = curl_exec($ch);
-
-					//var_dump(json_decode($result, true));
-					//$log->write( " 1  ReceiptsCancel end ".$result );
-
-					curl_close($ch);
-				}
-			}
-		}
-	}
+class ModelPaymentPayme extends Model {
 
 	public function CreateTable() {
 
