@@ -8,9 +8,9 @@
 
 ## Installation
 
-For OpenCart version from 2.0.0.0 to 2.2.0.0 please download the extension from [here](PayMe Gateway for OperCart ver 2.0.0.0.ocmod.zip). 
+For OpenCart version from 2.0.0.0 to 2.2.0.0 please download the extension from [here](PayMe_Gateway_for_OperCart_ver_2.0.0.0.ocmod.zip). 
 
-For OpenCart version from 2.3.0.2 please download the extension from [a workaround link](repo/blob/master/PayMe Gateway for OperCart ver 2.3.0.2/PayMe Gateway for OperCart ver 2.3.0.2.ocmod.zip)
+For OpenCart version from 2.3.0.2 please download the extension from [a workaround link](repo/blob/master/PayMe Gateway for OperCart ver 2.3.0.2/PayMe_Gateway_for_OperCart_ver_2.3.0.2.ocmod.zip)
 
 Sign into your OpenCart's admin panel.
 
