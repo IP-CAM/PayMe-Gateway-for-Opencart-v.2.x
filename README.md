@@ -6,7 +6,7 @@
 - Merchant ID, Production & Test Keys
 - Production & Test Gateway URLs
 
-## Installation
+## Downloads
 
 For OpenCart version from 2.0.0.0 to 2.1.0.2 please download [PayMe Gateway for OperCart ver 2.0.0.0](PayMe%20Gateway%20for%20OperCart%20ver%202.0.0.0/PayMe_Gateway_for_OperCart_ver_2.0.0.0.ocmod.zip). 
 
@@ -14,10 +14,19 @@ For OpenCart version 2.2.0.0 please                 download [PayMe Gateway for 
 
 For OpenCart version 2.3.0.2 please                 download [PayMe Gateway for OperCart ver 2.3.0.2](PayMe%20Gateway%20for%20OperCart%20ver%202.3.0.2/PayMe_Gateway_for_OperCart_ver_2.3.0.2.ocmod.zip).
 
-Sign into your OpenCart's admin panel.
 
-Go to the `Extensions \ Installer` page.
+## Installation
 
-Upload the downloaded ZIP archive.
+1) Sign into your OpenCart's admin panel.
 
-Progress bar should become green to indicate successful upload.
+2) Go to the `Extensions \ Installer` page. Upload the downloaded ZIP archive. Progress bar should become green to indicate successful upload.
+
+3) Then go to the `Extensions \ Extensions` page and set the extension type filter as `Payments`. Scroll the page little bit down and find the `Payme` extension. Install it by clicking the green `+` button located on that line.
+
+4) After successful installation green `+` button becomes red `-`, which removes the extension on click. Now the extension is installed successfully, but not configured yet. Click the blue pencil button to open configuration page of the extension.
+
+5) In the opened page configure the extension. Save the parameters.
+ 
+Now extension should become `Enabled` and ready to use.
+
+From now on the users can choose `Payme` as a payment method on the `Checkout` page.
