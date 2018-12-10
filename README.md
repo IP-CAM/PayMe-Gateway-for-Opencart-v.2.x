@@ -2,6 +2,9 @@
 
 ## Requirements
 
+- Web Server (Apache suggested)
+- Database (MySQLi suggested)
+- PHP Version 5.3+
 - OpenCart 2.x
 - Merchant ID, Production & Test Keys
 - Production & Test Gateway URLs
