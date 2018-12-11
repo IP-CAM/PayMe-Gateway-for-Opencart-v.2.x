@@ -11,13 +11,13 @@
 
 ## Downloads
 
-Скачайте плагин как [ZIP архив](https://github.com/PaycomUZ/PayMe-Gateway-for-OperCart-ver-2.x/releases)
+please download [ZIP fileshere ](https://github.com/PaycomUZ/PayMe-Gateway-for-OperCart-ver-2.x/releases/latest)
 
-For OpenCart version from 2.0.0.0 to 2.1.0.2 please download [PayMe Gateway for OperCart ver 2.0.0.0](PayMe%20Gateway%20for%20OperCart%20ver%202.0.0.0/PayMe_Gateway_for_OperCart_ver_2.0.0.0.ocmod.zip). 
+For OpenCart version from 2.0.0.0 to 2.1.0.2 please download PayMe_Gateway_for_OperCart_ver_2.0.0.0.ocmod.zip. 
 
-For OpenCart version 2.2.0.0 please                 download [PayMe Gateway for OperCart ver 2.2.0.0](PayMe%20Gateway%20for%20OperCart%20ver%202.2.0.0/PayMe_Gateway_for_OperCart_ver_2.2.0.0.ocmod.zip). 
+For OpenCart version 2.2.0.0 please                 download PayMe_Gateway_for_OperCart_ver_2.2.0.0.ocmod.zip. 
 
-For OpenCart version 2.3.0.2 please                 download [PayMe Gateway for OperCart ver 2.3.0.2](PayMe%20Gateway%20for%20OperCart%20ver%202.3.0.2/PayMe_Gateway_for_OperCart_ver_2.3.0.2.ocmod.zip).
+For OpenCart version 2.3.0.2 please                 download PayMe_Gateway_for_OperCart_ver_2.3.0.2.ocmod.zip.
 
 
 ## Installation
