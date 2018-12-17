@@ -198,7 +198,7 @@ class ControllerPaymentPayme extends Controller {
 		$data['entry_return_after_payment']      	= $this->language->get('entry_return_after_payment');
 		$data['entry_add_product_information_']  	= $this->language->get('entry_add_product_information_'); 
 
-		$data['payme_endpoint_url'] 				= str_replace('admin/', '', HTTPS_SERVER)."?route=payment/callback";
+		$data['payme_endpoint_url'] 				= str_replace('admin/', '', HTTPS_SERVER)."?route=payment/payme/callback";
 		$data['payme_order_return'] 				= str_replace('admin/', '', HTTPS_SERVER)."?route=account/order";
 		$data['payme_subscribe_api_url']      		= "https://checkout.paycom.uz/api";
 		$data['payme_subscribe_api_url_test'] 		= "https://checkout.test.paycom.uz/api";
