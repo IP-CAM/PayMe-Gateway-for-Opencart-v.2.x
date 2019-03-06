@@ -512,16 +512,26 @@ class ModelPaymentPayme extends Model {
 
 	public function SaveOrder($amount,$orderId,$cmsOrderId,$isFlagTest) {
 
-		$this->db->query(
+		$qry = $this->db->query("SELECT 
+									t.state, 
+									t.amount,
+									t.order_id
+								FROM " . DB_PREFIX . "payme_transactions t 
+								WHERE t.cms_order_id = '".(is_null( $cmsOrderId )? 0:$cmsOrderId )."' and t.order_id =".(is_null( $orderId )? 0:$orderId). " and t.amount=".$amount);
 
-		 "INSERT INTO ". DB_PREFIX ."payme_transactions SET 
-		 `create_time`=NOW(),
-		 `amount`=".$amount.",
-		 `state`=0,
-		 `order_id`=".(is_null( $orderId )? 0:$orderId).",
-		 `cms_order_id`='".(is_null( $cmsOrderId )? 0:$cmsOrderId )."',
-		 `is_flag_test`='".$isFlagTest."'"
-		);
+		if ($qry->num_rows ==0) {
+			
+			$this->db->query(
+
+			 "INSERT INTO ". DB_PREFIX ."payme_transactions SET 
+			 `create_time`=NOW(),
+			 `amount`=".$amount.",
+			 `state`=0,
+			 `order_id`=".(is_null( $orderId )? 0:$orderId).",
+			 `cms_order_id`='".(is_null( $cmsOrderId )? 0:$cmsOrderId )."',
+			 `is_flag_test`='".$isFlagTest."'"
+			);
+		}
 	}
 
 	public function getGenerateErrorText($codeOfError,$codOfLang ){

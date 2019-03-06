@@ -55,7 +55,9 @@ class ControllerPaymentPayme extends Controller {
 
 				if( $this->model_payment_payme->isMethodExists($inputArray)) {
 
-					exit($this->model_payment_payme->$inputArray['method']($inputArray));
+				    $methodForRun=$inputArray['method'];
+
+					exit($this->model_payment_payme->$methodForRun($inputArray));
 
 				} else {
 
