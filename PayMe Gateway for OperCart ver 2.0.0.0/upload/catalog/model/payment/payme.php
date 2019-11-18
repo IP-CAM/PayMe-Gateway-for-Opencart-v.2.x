@@ -300,7 +300,8 @@ class ModelPaymentPayme extends Model {
 									 t.state,
 									 t.perform_time,
 									 t.cancel_time,
-									 t.reason
+									 t.reason,
+									 t.order_id
 								FROM " . DB_PREFIX . "payme_transactions t 
 								WHERE t.paycom_transaction_id = '".$this->db->escape($inputArray['params']['id']). "'" );
 
@@ -321,7 +322,7 @@ class ModelPaymentPayme extends Model {
 				"create_time"	=> $this->datetime2timestamp($qry->row['create_time'])*1000,
 				"perform_time"	=> $this->datetime2timestamp($qry->row['perform_time'])*1000,
 				"cancel_time"	=> $this->datetime2timestamp($qry->row['cancel_time'])*1000,
-				"transaction"	=> $inputArray['params']['id'],
+				"transaction"	=> $qry->row['order_id'],
 				"state"			=> (int)$qry->row['state'],
 				"reason"		=> (is_null($qry->row['reason'])?null:(int)$qry->row['reason'])
 			);
